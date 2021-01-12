@@ -1,6 +1,6 @@
 import cv2, numpy as np
 import sys
-from time import sleep
+from time import sleep,time
 
 def flick(x):
     pass
@@ -29,7 +29,7 @@ def process(im):
     return cv2.cvtColor(im, cv2.COLOR_BGR2GRAY)
 
 status = 'stay'
-
+prev_time=time()
 while True:
   cv2.imshow("controls",controls)
   try:
@@ -53,12 +53,20 @@ while True:
                 ord('e'):'fast', ord('E'):'fast',
                 ord('c'):'snap', ord('C'):'snap',
                 -1: status, 
-                27: 'exit'}[cv2.waitKey(10)]
+                27: 'exit'}[cv2.waitKey(1)]
 
     if status == 'play':
+      now=time()
+      delta=now-prev_time
+      prev_time=now
       frame_rate = cv2.getTrackbarPos('F','image')
-      sleep((0.1-frame_rate/1000.0)**21021)
-      i+=1
+      if frame_rate<1:
+          status='stay'
+          continue
+      diff = max(1,int(delta*frame_rate))#this fixes the video playing too slowly
+      if diff==1:
+          sleep(max(0,1/frame_rate-delta))#1/frame_rate is how long the frame should take, and delta is the time already spent, so it should sleep the remaining amount of time for the frame to avoid playing too fast
+      i+=diff
       cv2.setTrackbarPos('S','image',i)
       continue
     if status == 'stay':
