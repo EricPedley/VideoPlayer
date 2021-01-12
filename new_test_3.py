@@ -83,9 +83,9 @@ while True:
         status='play'
     if status=='snap':
         cv2.imwrite("./"+"Snap_"+str(i)+".jpg",im)
-        print "Snap of Frame",i,"Taken!"
+        print("Snap of Frame",i,"Taken!")
         status='stay'
 
   except KeyError:
-      print "Invalid Key was pressed"
+      print("Invalid Key was pressed")
 cv2.destroyWindow('image')
