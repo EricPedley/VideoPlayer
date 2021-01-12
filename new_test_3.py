@@ -58,6 +58,7 @@ while True:
     if status == 'play':
       now=time()
       delta=now-prev_time
+      print(delta)
       prev_time=now
       frame_rate = cv2.getTrackbarPos('F','image')
       if frame_rate<1:
@@ -69,27 +70,27 @@ while True:
       i+=diff
       cv2.setTrackbarPos('S','image',i)
       continue
-    if status == 'stay':
+    elif status == 'stay':
       i = cv2.getTrackbarPos('S','image')
-    if status == 'exit':
+    elif status == 'exit':
         break
-    if status=='prev_frame':
+    elif status=='prev_frame':
         i-=1
         cv2.setTrackbarPos('S','image',i)
         status='stay'
-    if status=='next_frame':
+    elif status=='next_frame':
         i+=1
         cv2.setTrackbarPos('S','image',i)
         status='stay'
-    if status=='slow':
+    elif status=='slow':
         frame_rate = max(frame_rate - 5, 0)
         cv2.setTrackbarPos('F', 'image', frame_rate)
         status='play'
-    if status=='fast':
+    elif status=='fast':
         frame_rate = min(100,frame_rate+5)
         cv2.setTrackbarPos('F', 'image', frame_rate)
         status='play'
-    if status=='snap':
+    elif status=='snap':
         cv2.imwrite("./"+"Snap_"+str(i)+".jpg",im)
         print("Snap of Frame",i,"Taken!")
         status='stay'
