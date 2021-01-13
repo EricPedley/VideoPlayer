@@ -1,6 +1,8 @@
 import cv2, numpy as np
 import sys
 from time import sleep,time
+from queue import Queue
+from threading import Thread
 
 def flick(x):
     pass
@@ -28,6 +30,20 @@ cv2.setTrackbarPos('F','image',frame_rate)
 def process(im):
     return cv2.cvtColor(im, cv2.COLOR_BGR2GRAY)
 
+stopped=False
+frame_queue = Queue(maxsize=128)
+def updateQueueLoop():
+    while True:
+        if stopped:
+            return
+        if not frame_queue.full():
+            (grabbed,frame) = cap.read()
+            if not grabbed:
+                return
+            frame_queue.put(frame)
+frame_queue_thread = Thread(target=updateQueueLoop)
+frame_queue_thread.daemon=True
+frame_queue_thread.start()
 status = 'stay'
 prev_time=time()
 while True:
@@ -36,7 +52,8 @@ while True:
     if i==tots-1:
       i=0
     cap.set(cv2.CAP_PROP_POS_FRAMES, i)
-    ret, im = cap.read()
+    #ret, im = cap.read()#this is slow as hell. I don't know why, but while the program is running the time between frames starts at like 0.07, slowly increases to around 0.3, then goes back down to 0.7
+    im = frame_queue.get()
     r = 750.0 / im.shape[1]
     dim = (750, int(im.shape[0] * r))
     im = cv2.resize(im, dim, interpolation = cv2.INTER_AREA)
